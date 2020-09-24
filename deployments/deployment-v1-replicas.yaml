@@ -1,0 +1,30 @@
+#-------------------------------------------------------------
+# Create deployment with labels and replicaSet
+#-------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-app-with-replicas
+  labels:
+    app: simple-k8s-app-rs
+    env: production
+    owner: ididyk
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      project: k8s-app-rs
+  template:
+    metadata:
+      labels:
+        project: k8s-app-rs
+    spec:
+      containers:
+        - name: k8sapp-web
+          image: httpd:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80

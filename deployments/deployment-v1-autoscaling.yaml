@@ -1,0 +1,51 @@
+#-------------------------------------------------------------
+# Create deployment with labels and autoScaling
+#-------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-app-with-autoscaling
+  labels:
+    app: my-k8s-app
+    env: production
+    owner: ididyk
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      project: k8s-app-hap
+  template:
+    metadata:
+      labels:
+        project: k8s-app-hap
+    spec:
+      containers:
+        - name: k8sapp-3-web
+          image: adv4000/k8sphp:version1
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: k8s-autoscaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v2beta1v1
+    kind: Deployment
+    name: myapp-with-autoscaling
+  minReplicas: 4
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 70
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 70

@@ -1,0 +1,48 @@
+#---------------------------------------------------------------------
+# Create deployment with single container pod and service
+#---------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: single-pod-deployment
+  labels:
+    app:    single-k8s-deployment
+    env:    production
+    name:   k8s-demo
+    owner:  ididyk
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      project: k8s-demo-1
+  template:
+    metadata:
+      labels:
+        project: k8s-demo-1     # Service will look for those PODS Labels!!!
+    spec:
+      containers:
+        - name: k8s-demo-web
+          image: nginx:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: single-pod-service
+  labels:
+    env:    production
+    owner:  ididyk
+spec:
+  selector:
+    project: k8s-demo-1       # Selecting PODS with those Labels
+  ports:
+    - name: app-listener
+      protocol: TCP
+      port: 80                # Port on Load Balancer
+      targetPort: 80          # Port on POD
+  type: LoadBalancer

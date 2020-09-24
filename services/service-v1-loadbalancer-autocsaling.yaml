@@ -1,0 +1,67 @@
+#-------------------------------------------------------------------------------------
+# Create deployment with single container pod, autoScaling and service
+#-------------------------------------------------------------------------------------
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: simple-deployment-autoscaling
+  labels:
+    app:    k8s-deployment-autoscaling
+    env:    production
+    owner:  ididyk
+spec:
+  selector:
+    matchLabels:
+      project: k8s-demo-3
+  template:
+    metadata:
+      labels:
+        project: k8s-demo-3             #Important:  Service will look for those pods Labels !
+    spec:
+      containers:
+        - name : k8s-demo-3-web
+          image: nginx:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: simple-k8s-autoscaling
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v2beta1v1
+    kind: Deployment
+    name: simple-deployment-autoscaling
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: 70
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadbalancer-autoscaling-pod-service
+  labels:
+    env  : production
+    owner: ididyk
+spec:
+  selector:
+    project: k8s-demo-3           # Selecting PODs with those Labels
+    type: LoadBalancer
+  ports:
+    - name      : app-listener
+      protocol  : TCP
+      port      : 80              # Port on Load Balancer
+      targetPort: 80              # Port on Pod

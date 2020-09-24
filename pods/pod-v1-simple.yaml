@@ -1,0 +1,19 @@
+#-------------------------------------------------------------------------------------
+# Create single container pod
+#-------------------------------------------------------------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-web-v1
+  labels:
+    name: my-web-v1
+spec:
+  containers:
+    - name: container-apache
+      image: nginx:latest
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 80

@@ -1,0 +1,23 @@
+#-------------------------------------------------------------------------------------
+# Create single container pod with labels
+#-------------------------------------------------------------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-web-v2
+  labels:
+    env:   production
+    app:   main
+    tier:  server
+    name:  my-web-v2
+    owner: ididyk
+spec:
+  containers:
+    - name: container-nginx
+      image: nginx:latest
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 80

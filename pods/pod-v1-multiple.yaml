@@ -1,0 +1,31 @@
+#-------------------------------------------------------------------------------------
+# Create multiple container pods with labels
+#-------------------------------------------------------------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app-multiple
+  labels:
+    env: production
+    app: main
+    tier: backend
+    name: my-app-multiple
+    owner: ididyk
+spec:
+  containers:
+    - name: container-nginx
+      image: nginx:latest
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 80
+    - name: container-httpd
+      image: httpd:latest
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 8080

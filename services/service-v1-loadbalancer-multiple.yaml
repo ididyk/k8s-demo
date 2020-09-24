@@ -1,0 +1,60 @@
+#---------------------------------------------------------------------
+# Create deployment with multiple container pods and service
+#---------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multiple-pod-deployment
+  labels:
+    app: multiple-k8s-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      project: k8s-demo-2
+  template:
+    metadata:
+      labels:
+        project: k8s-demo-2
+    spec:
+      containers:
+        - name: my-web
+          image: nginx:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80         # Port on Pod
+
+        - name: not-my-web
+          image: tomcat:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080        # Port on Pod
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: multiple-pods-service
+  labels:
+    env:    production
+    owner:  ididyk
+spec:
+  type: LoadBalancer
+  selector:
+    project: k8s-demo-1
+  ports:
+    - name:       nginx-listener
+      protocol:   TCP
+      port:       80
+      targetPort: 80
+
+    - name:       tomcat-listener
+      protocol:   TCP
+      port:       5000
+      targetPort: 8080
